@@ -37,19 +37,30 @@ def dijkstra(G, end, start):
     path.reverse()
     return path
 
+# 因為 visited 與 stack 都只記錄「目前路徑上」的節點（離開節點時都會移除），
+# 不同分支之間沒有任何記憶，圖越密集（例如 DFA 經過幾次 difference() 後接近 complete graph）
+# 簡單迴圈的數量會組合爆炸。這裡先用深度與數量上限擋住，讓程式至少能跑完，
+# 不代表演算法已經改成 polynomial（例如 Johnson's algorithm）。
+MAX_CYCLE_DEPTH = 30
+MAX_CYCLES = 500
+
 # 尋找 loop 方法
-def dfs(G, v, visited, stack, all_cycles):  
+def dfs(G, v, visited, stack, all_cycles, max_depth=MAX_CYCLE_DEPTH, max_cycles=MAX_CYCLES):
+    if len(all_cycles) >= max_cycles or len(stack) >= max_depth:
+        return
     stack.append(v) # 用來記錄從起點到當前節點的整個搜尋路徑，以判斷 loop 的位置
     visited.append(v) # 記錄已經拜訪過的節點
     # 找出 neighbor
     total_edges = G.edges()
     for start, end in total_edges:
+        if len(all_cycles) >= max_cycles:
+            break
         if v == start:
             neighbor = end
             if neighbor == v: # 如果 neighbor 等於 v，則跳過自我迴圈的檢查
-                continue 
+                continue
             if neighbor not in visited:
-                dfs(G, neighbor, visited, stack, all_cycles)
+                dfs(G, neighbor, visited, stack, all_cycles, max_depth, max_cycles)
             elif neighbor in stack: # 在 stack 找 neighbor 的位置
                 cycle_start = stack.index(neighbor)
                 cycle = stack[cycle_start:] + [neighbor]
@@ -59,12 +70,12 @@ def dfs(G, v, visited, stack, all_cycles):
     visited.remove(v)
 
 """ 尋找圖中所有的 loop path """
-def find_all_cycles(G, start): 
+def find_all_cycles(G, start, max_depth=MAX_CYCLE_DEPTH, max_cycles=MAX_CYCLES):
     visited = []
     stack = []
     all_cycles = []
 
-    dfs(G, str(start), visited, stack, all_cycles)
+    dfs(G, str(start), visited, stack, all_cycles, max_depth, max_cycles)
     return all_cycles
 
 """ 找 unsat_core 在 path 中的位置"""
@@ -82,16 +93,20 @@ def find_core_index(G, core, path):
 """將 loop 加入 path """
 def add_cycle(path, cycle):
     new_path = path.copy()
+    is_connected = False
     # 判斷 loop 與 最短路徑相連嗎
-    for node in cycle: 
+    for node in cycle:
         if node in path:
             loop_start = path.index(node) + 1
             initial_loop_start = loop_start
             is_connected = True
             break
-    
-     # 若相連，則將 loop 加入 path  
-    if is_connected == True: 
+
+    if not is_connected:  # loop 與 path 無交集，原樣返回，不做合併
+        return len(path), new_path
+
+     # 若相連，則將 loop 加入 path
+    if is_connected == True:
         # 將 cycle 加入 path
         for node in cycle[1:]:  # 從第二個元素開始加
             new_path.insert(loop_start, node)
