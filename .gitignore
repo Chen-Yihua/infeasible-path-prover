@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+
+# Graphviz 產生的輸出檔（dot 原始檔與圖片）
+dfa
+dfa.png
+cfg
+cfg.png
+Digraph.gv
+*.gv
+
+.venv/
