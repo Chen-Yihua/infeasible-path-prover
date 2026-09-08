@@ -62,6 +62,18 @@ def find_unsat_core(assertions, edges):
                         return p, unsat_core
                     if n.eq(child):
                         return n, unsat_core
+        else:
+            # 賦值表達式已被 update_unsat_core() 轉成字串（例如 "n = n - 1"），
+            # 不是 Z3 BoolRef，沒有 .children() 可查，改比對字串開頭的變數名稱。
+            # 若 unsat core 剛好只由這種已改名的賦值式組成（沒有原始的 p/n 比較式留下），
+            # 前面的迴圈會找不到任何符合的 constraint，因此需要這個 fallback。
+            match = re.match(r'\s*(\w+)', constraint)
+            if match:
+                var_name = match.group(1)
+                if var_name == str(p):
+                    return p, unsat_core
+                if var_name == str(n):
+                    return n, unsat_core
 
 """根據 control flow graph，找出 unsat condition"""
 def find_unsat_condition(G, unsat_var):
