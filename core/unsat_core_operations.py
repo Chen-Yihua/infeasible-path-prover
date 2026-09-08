@@ -1,6 +1,5 @@
 from unittest import skip
 from z3 import *
-from asyncio.windows_events import NULL
 import re
 from . import dfa_operations
 
@@ -68,7 +67,7 @@ def find_unsat_core(assertions, edges):
 def find_unsat_condition(G, unsat_var):
     path_edges = set()
     assignment_pattern = rf'({unsat_var})\s*=\s*([^=].*)'
-    unsat_condition = NULL
+    unsat_condition = None
     total_edges = G.edges()
     for edge in total_edges: # 紀錄 control flow graph 中所有的邊
         label = dfa_operations.get_symbol(G, edge[0], edge[1])
