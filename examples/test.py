@@ -1,4 +1,3 @@
-from asyncio.windows_events import NULL
 from z3 import *
 from automata.fa.dfa import DFA
 from core import dfa_operations
