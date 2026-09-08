@@ -26,7 +26,6 @@ def find_trace(G, error_location, edge_mapping, start, edges):
         new_interpolant = get_interpolant.creat_interpolant(new_conditions)
         dfa = dfa_operations.build_dfa(G, new_path, edge_mapping, start, error_location, reject_start)
         dfa_operations.draw_dfa(dfa)  # 畫出 p 之 dfa
-        dfa.show_diagram()
         result = get_interpolant.check_interpolant_equality(interpolant, new_interpolant)
         if result == unsat: # 檢查語意，若 interpolant 相同，更新 path
             path = new_path
@@ -37,7 +36,6 @@ def find_trace(G, error_location, edge_mapping, start, edges):
                     break
     dfa = dfa_operations.build_dfa(G, new_path, edge_mapping, start, error_location, reject_start)
     dfa_operations.draw_dfa(dfa)  # 畫出 p 之 dfa
-    dfa.show_diagram()
     return path, dfa
 
 
@@ -63,15 +61,14 @@ total_dfa = DFA(
     final_states={'Nodeerr'}
 )
 # 製作 control flow graph
-G = total_dfa.show_diagram()
-print(G)
+G = dfa_operations.build_graph(total_dfa)
 
 # 找出所有的 trace
 while complete == False:
     trace, dfa = find_trace(G, end, dfa_operations.edge_mapping, start, edges)
     diff = total_dfa.difference(dfa)
-    G = dfa_operations.draw_dfa(diff) # 畫出差集後的圖
-    G = diff.show_diagram()
+    dfa_operations.draw_dfa(diff) # 畫出差集後的圖
+    G = dfa_operations.build_graph(diff)
     if(diff.isempty() != True): # 若差集完非空，則繼續找 trace
         start = diff.initial_state
         end = dfa_operations.forzenset_mapping(diff.final_states)

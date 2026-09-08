@@ -29,7 +29,6 @@ def find_trace(G, error_location, edge_mapping, start, edges):
     # dfa = dfa_operations.build_dfa(G, new_path, edge_mapping, start, error_location, unsat_condition)
     dfa = dfa_operations.update_dfa(G, edge_mapping, start, error_location, unsat_condition, unsat_core)
     dfa_operations.draw_dfa(dfa)  # 畫出 p 之 dfa
-    dfa.show_diagram()
     return path, dfa
 
 """ 判斷 loop 有無更改衝突變數，若無則可加入 path """
@@ -73,7 +72,7 @@ total_dfa = DFA(
 )
 # cfw(G) # 製作 control flow graph
 dfa_operations.draw_dfa(total_dfa)
-G = total_dfa.show_diagram()
+G = dfa_operations.build_graph(total_dfa)
 # dfa = VisualDFA(total_dfa) # Convert automata-lib DFA to VisualDFA
 # dfa.show_diagram(view=True)
 
@@ -82,8 +81,8 @@ while complete == False:
     trace, dfa = find_trace(G, end, dfa_operations.edge_mapping, start, edges)
     diff = total_dfa.difference(dfa)
     print(total_dfa.issuperset(diff))
-    G = dfa_operations.draw_dfa(diff) # 畫出差集後的圖
-    G = diff.show_diagram()
+    dfa_operations.draw_dfa(diff) # 畫出差集後的圖
+    G = dfa_operations.build_graph(diff)
     if(diff.isempty() != True): # 若差集完非空，則繼續找 trace
         start = diff.initial_state
         end = dfa_operations.forzenset_mapping(diff.final_states)

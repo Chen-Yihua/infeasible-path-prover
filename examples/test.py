@@ -48,7 +48,6 @@ def find_trace(G, error_location, edge_mapping, start, edges, method="unsat_core
 
     dfa = dfa_operations.build_dfa(G, path, edge_mapping, start, error_location, reject_start)
     dfa_operations.draw_dfa(dfa)
-    dfa.show_diagram()
     return path, dfa
 
 """ 判斷 loop 有無更改衝突變數，若無則可加入 path """
@@ -90,14 +89,14 @@ total_dfa = DFA(
 )
 # cfw(G) # 製作 control flow graph
 dfa_operations.draw_dfa(total_dfa)
-G = total_dfa.show_diagram()
+G = dfa_operations.build_graph(total_dfa)
 
 # 找出所有的 trace
 while complete == False:
     trace, dfa = find_trace(G, end, dfa_operations.edge_mapping, start, edges)
     diff = total_dfa.difference(dfa)
-    G = dfa_operations.draw_dfa(diff) # 畫出差集後的圖
-    G = diff.show_diagram()
+    dfa_operations.draw_dfa(diff) # 畫出差集後的圖
+    G = dfa_operations.build_graph(diff)
     if(diff.isempty() != True): # 若差集完非空，則繼續找 trace
         start = diff.initial_state
         end = dfa_operations.forzenset_mapping(diff.final_states)
