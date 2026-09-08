@@ -67,7 +67,7 @@ def draw_dfa(dfa):
             dot.edge(str(from_state), str(to_state), label=value)
             G[(from_state, to_state)] = {'label': value}
 
-    dot.render('dfa', format='png', view=True)
+    dot.render('dfa', format='png', view=False)
     return G
 
 """從兩點找邊 symbol"""
