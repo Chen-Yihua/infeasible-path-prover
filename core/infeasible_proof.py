@@ -20,8 +20,8 @@ def begin(*args): # args 為一連串的表達式
 
         for s in reversed(args): # 假設 s 是函數
             if callable(s):
-                # 執行 s 函數，得到賦值操作表達式
-                new_var, new_condition, wp = s(wp, 1)  # 使用 1 作為初始替換計數
+                # 只取得此變量對應的 Symbol，不對 wp 做替換（避免 wp 被提前替換掉）
+                new_var, _, _ = s(BoolVal(True), 1)  # 使用 1 作為初始替換計數
                 if new_var not in counter: # 初始化計數器
                     counter[new_var] = 1
                 else: 
