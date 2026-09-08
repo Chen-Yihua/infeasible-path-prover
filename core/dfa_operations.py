@@ -49,6 +49,39 @@ def get_key_from_value(mapping, value):
 def symbol_to_value(symbol):
     return get_key_from_value(edge_mapping, symbol)
 
+
+class _Edge(tuple):
+    """模仿 pygraphviz Edge：可拆解為 (start, end)，並提供 .attr['label']"""
+    def __new__(cls, start, end, label):
+        edge = super().__new__(cls, (start, end))
+        edge.attr = {'label': label}
+        return edge
+
+
+class _Graph:
+    """模仿 pygraphviz AGraph 僅有的 .nodes()/.edges() 介面"""
+    def __init__(self, nodes, edges):
+        self._nodes = nodes
+        self._edges = edges
+
+    def nodes(self):
+        return self._nodes
+
+    def edges(self):
+        return self._edges
+
+
+"""以 DFA 建立圖物件（取代 automata-lib 的 show_diagram()，
+避免其底層 pygraphviz 在本機環境重複呼叫時可能卡死的問題）"""
+def build_graph(dfa):
+    nodes = [str(state) for state in dfa.states]
+    edges = [
+        _Edge(str(from_state), str(to_state), symbol)  # label 為 DFA 的原始 input symbol（數字字串），與 show_diagram() 的慣例一致
+        for from_state, transitions in dfa.transitions.items()
+        for symbol, to_state in transitions.items()
+    ]
+    return _Graph(nodes, edges)
+
 # """畫出 dfa"""
 def draw_dfa(dfa):
     G = {}
