@@ -1,6 +1,6 @@
-# automata
+# Infeasible Path Prover
 
-The practice of Software Model Checking for people who love automata.
+以自動機（DFA）表示程式路徑，並用 Z3 / PySMT 證明其不可行性的 Software Model Checking 練習專案。
 
 本專案以 **DFA（決定性有限自動機）** 表示程式的所有執行路徑（trace），並利用 **Z3** / **PySMT** 對每條路徑進行不可行性（infeasibility）證明，證明方法包括：
 
